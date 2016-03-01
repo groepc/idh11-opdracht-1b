@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Android1b</string>
     <string name="action_settings">Settings</string>
+    <string name="no_connection">Er kon geen verbinding gemaakt worden</string>
     <string-array name="select_options">
         <item>UDP</item>
         <item>TCP</item>
