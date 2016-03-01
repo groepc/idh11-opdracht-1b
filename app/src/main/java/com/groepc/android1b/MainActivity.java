@@ -15,11 +15,14 @@ import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -152,39 +155,49 @@ public class MainActivity extends AppCompatActivity {
 
         public String UDPClient (String ipAddress, Integer portNumber, String text) {
 
-            String modifiedSentence = null;
+            BufferedReader inFromUser
+                    = new BufferedReader(new InputStreamReader(System.in));
+
+            DatagramSocket clientSocket = null;
             try {
-                BufferedReader inFromUser
-                        = new BufferedReader(new InputStreamReader(System.in));
-
-                DatagramSocket clientSocket = null;
-
                 clientSocket = new DatagramSocket();
-
-                InetAddress IPAddress = null;
-                IPAddress = InetAddress.getByName(ipAddress);
-
-
-                byte[] sendData = new byte[1024];
-                byte[] receiveData = new byte[1024];
-
-
-                sendData = text.getBytes();
-                DatagramPacket sendPacket
-                        = new DatagramPacket(sendData, sendData.length, IPAddress, portNumber);
-
-
-                clientSocket.send(sendPacket);
-
-
-                DatagramPacket receivePacket
-                        = new DatagramPacket(receiveData, receiveData.length);
-
-
-               modifiedSentence = new String(receivePacket.getData());
-            } catch (Exception e) {
-                modifiedSentence = getString(R.string.no_connection);
+            } catch (SocketException e) {
+                e.printStackTrace();
             }
+
+            InetAddress IPAddress = null;
+            try {
+                IPAddress = InetAddress.getByName(ipAddress);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+
+            byte[] sendData = new byte[1024];
+            byte[] receiveData = new byte[1024];
+
+
+            sendData = text.getBytes();
+            DatagramPacket sendPacket
+                    = new DatagramPacket(sendData, sendData.length, IPAddress, portNumber);
+
+            try {
+                clientSocket.send(sendPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            DatagramPacket receivePacket
+                    = new DatagramPacket(receiveData, receiveData.length);
+
+            try {
+                clientSocket.receive(receivePacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String modifiedSentence
+                    = new String(receivePacket.getData());
+
             return modifiedSentence;
         }
     }
