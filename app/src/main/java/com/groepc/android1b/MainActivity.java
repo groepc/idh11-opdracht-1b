@@ -15,14 +15,11 @@ import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -161,16 +158,12 @@ public class MainActivity extends AppCompatActivity {
             DatagramSocket clientSocket = null;
             try {
                 clientSocket = new DatagramSocket();
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
+
 
             InetAddress IPAddress = null;
-            try {
+
                 IPAddress = InetAddress.getByName(ipAddress);
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
+
 
             byte[] sendData = new byte[1024];
             byte[] receiveData = new byte[1024];
@@ -180,25 +173,21 @@ public class MainActivity extends AppCompatActivity {
             DatagramPacket sendPacket
                     = new DatagramPacket(sendData, sendData.length, IPAddress, portNumber);
 
-            try {
+                clientSocket.setSoTimeout(1000);
                 clientSocket.send(sendPacket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
 
             DatagramPacket receivePacket
                     = new DatagramPacket(receiveData, receiveData.length);
 
-            try {
-                clientSocket.receive(receivePacket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-            String modifiedSentence
-                    = new String(receivePacket.getData());
+            clientSocket.receive(receivePacket);
+                return new String(receivePacket.getData());
+        } catch (Exception e) {
+                return getString(R.string.no_connection);
 
-            return modifiedSentence;
+        }
+
         }
     }
 }
